@@ -1,6 +1,6 @@
 // shipper/consignment-service/proto/consignment/consignment.proto
 
-syntax = "proto3"
+syntax = "proto3";
 
 package go.micro.srv.consignment;
 
@@ -27,16 +27,20 @@ message Consignment {
 
 
 message Container {
-  string id = 1
+  string id = 1;
   string customer_id = 2;
-  string origin = 3
-  string user_id = 4
+  string origin = 3;
+  string user_id = 4;
 }
 
 
 message Response {
   bool created = 1;
   Consignment consignment = 2;
+  repeated Consignment consignments = 3;
+}
+
+message GetRequest {
 
 }
 
