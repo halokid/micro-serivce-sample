@@ -1,10 +1,10 @@
-package  main
+package main
 
 import (
-  "context"
-  "log"
-  "net"
   pb "shippy/consignment-service/proto/consignment"
+  "context"
+  "net"
+  "log"
   "google.golang.org/grpc"
 )
 
@@ -12,32 +12,44 @@ const (
   PORT = ":50051"
 )
 
+//
+// 仓库接口
+//
 type IRepository interface {
-  Create(consignment *pb.Consignment) (*pb.Consignment, error)
-
-  GetAll() []*pb.Consignment
+  Create(consignment *pb.Consignment) (*pb.Consignment, error) // 存放新货物
+  GetAll() []*pb.Consignment                                   // 获取仓库中所有的货物
 }
 
-
-type Repositry struct {
+//
+// 我们存放多批货物的仓库，实现了 IRepository 接口
+//
+type Repository struct {
   consignments []*pb.Consignment
 }
 
-func (repo *Repositry) Create(consignment *pb.Consignment) (*pb.Consignment, error)  {
+func (repo *Repository) Create(consignment *pb.Consignment) (*pb.Consignment, error) {
   repo.consignments = append(repo.consignments, consignment)
   return consignment, nil
 }
 
-func (repo *Repositry) GetAll() []*pb.Consignment  {
+func (repo *Repository) GetAll() []*pb.Consignment {
   return repo.consignments
 }
 
+//
+// 定义微服务
+//
 type service struct {
-  repo Repositry
+  repo Repository
 }
 
-
+//
+// 实现 consignment.pb.go 中的 ShippingServiceServer 接口
+// 使 service 作为 gRPC 的服务端
+//
+// 托运新的货物
 func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*pb.Response, error) {
+  // 接收承运的货物
   consignment, err := s.repo.Create(req)
   if err != nil {
     return nil, err
@@ -46,30 +58,27 @@ func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*
   return resp, nil
 }
 
-
+// 获取目前所有托运的货物
 func (s *service) GetConsignments(ctx context.Context, req *pb.GetRequest) (*pb.Response, error) {
-  allCOnsignments := s.repo.GetAll()
-  resp := &pb.Response{Consignments: allCOnsignments}
+  allConsignments := s.repo.GetAll()
+  resp := &pb.Response{Consignments: allConsignments}
   return resp, nil
 }
 
 func main() {
   listener, err := net.Listen("tcp", PORT)
   if err != nil {
-    log.Fatal("failed to listen: %v", err)
+    log.Fatalf("failed to listen: %v", err)
   }
   log.Printf("listen on: %s\n", PORT)
 
   server := grpc.NewServer()
-  repo := Repositry{}
+  repo := Repository{}
   pb.RegisterShippingServiceServer(server, &service{repo})
 
   if err := server.Serve(listener); err != nil {
-    log.Fatal("failed to server: %v", err)
+    log.Fatalf("failed to serve: %v", err)
   }
 }
-
-
-
 
 
