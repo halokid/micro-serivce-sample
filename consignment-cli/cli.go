@@ -51,9 +51,18 @@ func main()  {
     log.Fatalf("create consignments: %v ", err)
   }
 
+  log.Printf("create: %t", resp.Created)
+  log.Printf("resp: %v", resp)
+
+  resp, err = client.GetConsignments(context.Background(), &pb.GetRequest{})
+  if err != nil {
+    log.Fatalf("faild to list consigment:  %v", err)
+  }
+
   for _, c := range resp.Consignments {
     log.Printf("%+v", c)
   }
+
 }
 
 
