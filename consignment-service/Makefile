@@ -1,5 +1,5 @@
 protoc:
-	protoc -I. --go_out=plugins=micro:/Users/kxy/gopath/src/shippy/consignment-service proto/consignment/consignment.proto
+	protoc -I. --go_out=plugins=micro:$(HOME)/gopath/src/shippy/consignment-service proto/consignment/consignment.proto
 
 
 build-docker:

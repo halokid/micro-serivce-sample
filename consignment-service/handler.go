@@ -17,6 +17,7 @@ type handler struct {
 
 // 从主会话中 Clone() 出新会话处理查询
 // todo: golang的一个牛逼之处就在于，啥程度逻辑都可以返回 interfaces{} 类型，比如这个
+// todo: Repository 的三个方法是用来执行SQL查询的， 这个函数表示在执行sql之前， 先clone了一个mgo的会话，所以是先return的， clone的这个会话是供执行sql用的
 func (h *handler) GetRepo() Repository  {
   // 执行了 Repository 的方法之后， 然后就返回下面的逻辑， 也就是关闭数据库
   // 所以目的就是 执行sql之后， 然后就关闭数据库
